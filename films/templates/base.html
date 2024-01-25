@@ -33,19 +33,47 @@
       crossorigin="anonymous"></script>
 
     <!-- HTMX -->
-    <!-- <script src="https://unpkg.com/htmx.org@1.6.0"></script> -->
+
     <script
       src="https://unpkg.com/htmx.org@1.9.10"
       integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
       crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   </head>
   <body>
     {% include 'partials/navbar.html' %}
 
     <div class="container mt-4">{% block content %} {% endblock %}</div>
     <script>
-      document.body.addEventListener('htmx:configRequest', function(event) {
-    event.detail.headers['X-CSRFToken'] = "{{csrf_token}}";
+      document.body.addEventListener("htmx:configRequest", function (event) {
+        event.detail.headers["X-CSRFToken"] = "{{csrf_token}}";
+      });
+
+      htmx.onLoad(function (content) {
+        var sortables = content.querySelectorAll(".sortable");
+        for (var i = 0; i < sortables.length; i++) {
+          var sortable = sortables[i];
+          var sortableInstance = new Sortable(sortable, {
+            animation: 150,
+            ghostClass: "blue-background-class",
+
+            // Make the `.htmx-indicator` unsortable
+            filter: ".htmx-indicator",
+            onMove: function (evt) {
+              return evt.related.className.indexOf("htmx-indicator") === -1;
+            },
+
+            // Disable sorting on the `end` event
+            onEnd: function (evt) {
+              this.option("disabled", true);
+            },
+          });
+
+          // Re-enable sorting on the `htmx:afterSwap` event
+          sortable.addEventListener("htmx:afterSwap", function () {
+            sortableInstance.option("disabled", false);
+          });
+        }
       });
     </script>
   </body>
