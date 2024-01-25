@@ -1,0 +1,15 @@
+<div class="d-flex justify-content-between">
+  <form>
+    <!-- prettier-ignore -->
+    {% csrf_token %}
+    <!-- prettier-ignore -->
+    <input type="text"
+    name="search"
+    hx-post={% url 'search-film' %}
+    hx-trigger="keyup change delay:500ms"
+    hx-target="#results"
+    class="form-contorl-sm mr-2 mb-4"
+    placeholder="Search films ...">
+  </form>
+</div>
+<div id="results"></div>
